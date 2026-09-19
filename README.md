@@ -46,7 +46,7 @@ npx supabase db push
 - [x] Run the scaffold command above
 - [x] Create two Supabase projects (dev + prod)
 - [x] Fill in `.env.local` from `.env.local.example` (Supabase values)
-- [ ] Apply the schema to the dev project (`supabase link` + `supabase db push`)
+- [x] Apply the schema to the dev project (`supabase link` + `supabase db push`)
 - [ ] Get a Gemini API key
 - [ ] Get Google Cloud TTS credentials
 - [ ] Decide parent auth method (recommend magic-link/OTP)
