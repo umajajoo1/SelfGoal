@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phase 1 Architecture - English Fluency App</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  body {
+    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+    color: #1a1a1a;
+    background: #fafafa;
+  }
+  h1 { font-size: 1.4rem; }
+  .mermaid { background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; }
+  .legend {
+    margin-top: 24px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px 24px;
+  }
+  .legend h2 { font-size: 1.1rem; }
+  .legend li { margin-bottom: 6px; }
+  code { background: #eee; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+  <h1>Phase 1 Architecture &mdash; English Fluency App (MVP)</h1>
+
+  <div class="mermaid">
+flowchart TB
+    subgraph Client["Client (Browser / PWA)"]
+        UI_Diag["Diagnostic UI\n(child-facing, audio-narrated)"]
+        UI_Content["Lesson/Content UI\n(age-banded, skill-adjusted)"]
+        UI_Dash["Parent Dashboard\n(root-cause report, streaks)"]
+    end
+
+    subgraph App["Next.js App (Vercel, serverless functions)"]
+        API_Diag["/api/diagnostic\nDiagnostic Engine\n[Strategy pattern: next-question logic]"]
+        API_Content["/api/content\nContent Service"]
+        API_Progress["/api/progress\nMastery Tracker"]
+        Events["Event Bus\n(on activity complete)"]
+    end
+
+    subgraph Repo["Data Access Layer"]
+        R1["skillRepository"]
+        R2["diagnosticRepository"]
+        R3["contentRepository"]
+        R4["progressRepository"]
+        note1["[Repository pattern:\nisolates Supabase calls\nfrom business logic]"]
+    end
+
+    subgraph Adapters["AI Adapter Layer"]
+        A1["IContentGenerator\n(Gemini Adapter)"]
+        A2["ITextToSpeech\n(Google TTS Adapter)"]
+        Cache["TTS Cache Decorator\n[Decorator pattern:\ncheck cache before API call]"]
+    end
+
+    subgraph External["External Services"]
+        Gemini["Gemini API\n(free tier dev -> paid for real users)"]
+        TTS["Google Cloud TTS\n(free tier, en-IN voices)"]
+        Pay["Razorpay\n(Phase 2 - payments)"]
+    end
+
+    subgraph Data["Supabase"]
+        DB[("Postgres:\nstudents, skill_graph,\ndiagnostic_results, mastery,\ncontent, badges")]
+        Auth["Supabase Auth\n(parent accounts)"]
+        Storage["Supabase Storage\n(cached TTS audio files)"]
+    end
+
+    subgraph Jobs["Background Jobs (Vercel Cron)"]
+        J1["Weekly parent report generator"]
+        J2["Badge/streak evaluator"]
+        J3["(Phase 2) Offline content\nbatch pre-generation"]
+    end
+
+    UI_Diag --> API_Diag
+    UI_Content --> API_Content
+    UI_Dash --> API_Progress
+
+    API_Diag --> R2
+    API_Diag --> A2
+    API_Content --> R3
+    API_Content --> A2
+    API_Progress --> R4
+    API_Diag --> Events
+    API_Content --> Events
+    Events --> R4
+    Events --> J2
+
+    R1 --> DB
+    R2 --> DB
+    R3 --> DB
+    R4 --> DB
+
+    A1 --> Gemini
+    A2 --> Cache
+    Cache --> Storage
+    Cache -.cache miss.-> TTS
+
+    Auth --> DB
+    J1 --> DB
+    J2 --> DB
+    J3 -.-> A1
+
+    UI_Dash -.future.-> Pay
+
+    style Pay stroke-dasharray: 5 5
+    style J3 stroke-dasharray: 5 5
+  </div>
+
+  <div class="legend">
+    <h2>Design pattern legend</h2>
+    <ul>
+      <li><b>Repository</b> (<code>skillRepository</code>, <code>diagnosticRepository</code>, etc.) &mdash; only layer that talks to Supabase directly.</li>
+      <li><b>Adapter</b> (<code>IContentGenerator</code>, <code>ITextToSpeech</code>) &mdash; only layer that talks to Gemini/Google TTS; swappable later without touching app logic.</li>
+      <li><b>Decorator</b> (TTS Cache) &mdash; checks Supabase Storage before ever calling the real TTS API, stretching the free tier.</li>
+      <li><b>Strategy</b> (inside Diagnostic Engine) &mdash; the "what question comes next" logic is isolated so it can start rule-based and get smarter later.</li>
+      <li><b>Event-driven</b> (Event Bus) &mdash; one "activity completed" event fans out to mastery update, dashboard refresh, and badge checks independently.</li>
+    </ul>
+    <p>Dashed items (Razorpay, offline batch pre-generation) are Phase 2 &mdash; shown as seams, not built yet.</p>
+  </div>
+
+<script>
+  mermaid.initialize({ startOnLoad: true, securityLevel: "loose" });
+</script>
+</body>
+</html>
