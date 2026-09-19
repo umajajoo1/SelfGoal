@@ -3,7 +3,7 @@
 B2C EdTech app that builds genuine English fluency for struggling CBSE class 2–5 students — content is matched to a child's actual skill level, not their nominal grade.
 
 ## Status
-Scaffolded. Next.js app builds cleanly; Supabase projects and API keys still need to be created. See [Next steps](#next-steps).
+Scaffolded. Next.js app builds cleanly. Supabase dev + prod projects are created and `.env.local` is populated. Gemini and Google Cloud TTS credentials still need to be created. See [Next steps](#next-steps).
 
 ## Architecture
 Rendered diagram: [docs/diagrams/architecture.html](docs/diagrams/architecture.html) (open directly in a browser).
@@ -33,11 +33,10 @@ Next.js (TypeScript, Tailwind, App Router) · Supabase (Postgres + Auth + Storag
 npm install
 npm run dev
 
-# Copy the env template and fill in real values
-cp .env.local.example .env.local
+# .env.local already exists with the dev Supabase project's keys filled in;
+# add GEMINI_API_KEY and GOOGLE_APPLICATION_CREDENTIALS_JSON yourself.
 
-# Apply the schema to a Supabase project
-npx supabase init
+# Apply the schema to the dev Supabase project
 npx supabase link --project-ref <dev-project-ref>
 npx supabase db push
 ```
@@ -45,8 +44,9 @@ npx supabase db push
 ## Next steps
 - [x] Create the GitHub repo
 - [x] Run the scaffold command above
-- [ ] Create two Supabase projects (dev + prod)
+- [x] Create two Supabase projects (dev + prod)
+- [x] Fill in `.env.local` from `.env.local.example` (Supabase values)
+- [ ] Apply the schema to the dev project (`supabase link` + `supabase db push`)
 - [ ] Get a Gemini API key
 - [ ] Get Google Cloud TTS credentials
 - [ ] Decide parent auth method (recommend magic-link/OTP)
-- [ ] Fill in `.env.local` from `.env.local.example`
