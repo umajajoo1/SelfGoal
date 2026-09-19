@@ -3,7 +3,7 @@
 B2C EdTech app that builds genuine English fluency for struggling CBSE class 2–5 students — content is matched to a child's actual skill level, not their nominal grade.
 
 ## Status
-Pre-scaffold planning stage. See [Next steps](#next-steps).
+Scaffolded. Next.js app builds cleanly; Supabase projects and API keys still need to be created. See [Next steps](#next-steps).
 
 ## Architecture
 Rendered diagram: [docs/diagrams/architecture.html](docs/diagrams/architecture.html) (open directly in a browser).
@@ -29,9 +29,12 @@ Next.js (TypeScript, Tailwind, App Router) · Supabase (Postgres + Auth + Storag
 
 ## Getting started
 ```powershell
-# Scaffold the app (not yet run)
-npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm --no-turbopack
-npm install @supabase/supabase-js @supabase/ssr @google/generative-ai zod
+# Already scaffolded -- just install and run
+npm install
+npm run dev
+
+# Copy the env template and fill in real values
+cp .env.local.example .env.local
 
 # Apply the schema to a Supabase project
 npx supabase init
@@ -40,9 +43,10 @@ npx supabase db push
 ```
 
 ## Next steps
-- [ ] Create the GitHub repo
+- [x] Create the GitHub repo
+- [x] Run the scaffold command above
 - [ ] Create two Supabase projects (dev + prod)
 - [ ] Get a Gemini API key
 - [ ] Get Google Cloud TTS credentials
 - [ ] Decide parent auth method (recommend magic-link/OTP)
-- [ ] Run the scaffold command above
+- [ ] Fill in `.env.local` from `.env.local.example`
